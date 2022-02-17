@@ -1,0 +1,68 @@
+buildscript {
+    ext {
+        boot = "org.springframework.boot"
+        spring_boot_version = '2.4.3'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("$boot:spring-boot-gradle-plugin:$spring_boot_version")
+    }
+}
+
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    repositories {
+        mavenCentral()
+    }
+
+    group = 'com.huyeon'
+    version = '1.0.0'
+    sourceCompatibility = '11'
+}
+
+subprojects {
+    dependencies{
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        compileOnly 'org.projectlombok:lombok'
+        developmentOnly 'org.springframework.boot:spring-boot-devtools'
+        runtimeOnly 'com.h2database:h2'
+        runtimeOnly 'mysql:mysql-connector-java'
+        annotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.springframework.security:spring-security-test'
+
+        // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
+        implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+["server"].each {
+    def subProjectDir = new File(projectDir, it)
+    subProjectDir.eachDir { dir ->
+        def projectName = ":${it}-${dir.name}"
+        project(projectName) {
+
+        }
+    }
+}
+
+help.enabled(false)
